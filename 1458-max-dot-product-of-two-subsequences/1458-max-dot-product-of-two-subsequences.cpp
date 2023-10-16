@@ -1,46 +1,36 @@
 class Solution {
 public:
-    vector<vector<int>> memo;
-    
-    int dp(int i, int j, vector<int>& nums1, vector<int>& nums2) {
-        if (i == nums1.size() || j == nums2.size()) {
-            return 0;
+    int solve(int i, int j,vector<int>& nums1, vector<int>& nums2,vector<vector<int>> &dp)
+    {
+        if(i == nums1.size() || j == nums2.size())
+        {
+            return 0 ;
         }
-        
-        if (memo[i][j] != 0) {
-            return memo[i][j];
-        }
-        
-        int use = nums1[i] * nums2[j] + dp(i + 1, j + 1, nums1, nums2);
-        memo[i][j] = max(use, max(dp(i + 1, j, nums1, nums2), dp(i, j + 1, nums1, nums2)));
-        return memo[i][j];
-    }
-    
-    int maxDotProduct(vector<int>& nums1, vector<int>& nums2) {
-        int firstMax = INT_MIN;
-        int secondMax = INT_MIN;
-        int firstMin = INT_MAX;
-        int secondMin = INT_MAX;
-        
-        for (int num: nums1) {
-            firstMax = max(firstMax, num);
-            firstMin = min(firstMin, num);
-        }
-        
-        for (int num: nums2) {
-            secondMax = max(secondMax, num);
-            secondMin = min(secondMin, num);
-        }
-        
-        if (firstMax < 0 && secondMin > 0) {
-            return firstMax * secondMin;
-        }
-        
-        if (firstMin > 0 && secondMax < 0) {
-            return firstMin * secondMax;
-        } 
+        if(dp[i][j] != -1)
+          return dp[i][j] ;
 
-        memo = vector(nums1.size(), vector(nums2.size(), 0));
-        return dp(0, 0, nums1, nums2);
+       return dp[i][j] = max(max((nums1[i]*nums2[j] + solve(i+1,j+1,nums1,nums2,dp)),solve(i,j+1,nums1,nums2,dp)),
+       solve(i+1,j,nums1,nums2,dp)) ;
+    }
+    int maxDotProduct(vector<int>& nums1, vector<int>& nums2) 
+    {
+       int n = nums1.size() ;
+       int m = nums2.size() ;
+
+       vector<vector<int>> dp(501,vector<int> (501,-1)) ;
+       int ans = solve(0,0,nums1,nums2,dp) ;  
+       
+       if(ans == 0)
+       {
+           sort(nums1.begin(),nums1.end()) ;
+           sort(nums2.begin(),nums2.end()) ;
+
+           if(nums1[0] < 0)
+              return nums1[n-1]*nums2[0] ;
+           else
+              return nums1[0]*nums2[m-1] ;
+       }
+
+       return ans ;
     }
 };
